@@ -77,7 +77,7 @@ static GBool bbox = gFalse;
 static GBool bboxLayout = gFalse;
 static GBool physLayout = gFalse;
 static double fixedPitch = 0;
-static GBool rawOrder = gFalse;
+static int rawOrder = 0;
 static GBool htmlMeta = gFalse;
 static char textEncName[128] = "";
 static char textEOL[16] = "";
@@ -110,6 +110,8 @@ static const ArgDesc argDesc[] = {
    "assume fixed-pitch (or tabular) text"},
   {"-raw",     argFlag,     &rawOrder,      0,
    "keep strings in content stream order"},
+  {"-raw2",     argInt,     &rawOrder,      0,
+   "keep strings in content stream order2"},
   {"-htmlmeta", argFlag,   &htmlMeta,       0,
    "generate a simple HTML file, including the meta information"},
   {"-enc",     argString,   textEncName,    sizeof(textEncName),
@@ -315,9 +317,9 @@ int main(int argc, char *argv[]) {
       f = stdout;
     } else {
       if (!(f = fopen(textFileName->getCString(), "wb"))) {
-	error(errIO, -1, "Couldn't open text file '{0:t}'", textFileName);
-	exitCode = 2;
-	goto err3;
+        error(errIO, -1, "Couldn't open text file '{0:t}'", textFileName);
+        exitCode = 2;
+        goto err3;
       }
     }
     fputs("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">", f);
@@ -353,7 +355,7 @@ int main(int argc, char *argv[]) {
     if (!bbox) {
       fputs("<pre>\n", f);
       if (f != stdout) {
-	fclose(f);
+        fclose(f);
       }
     }
   }
@@ -378,15 +380,15 @@ int main(int argc, char *argv[]) {
 				physLayout, fixedPitch, rawOrder, htmlMeta);
     if (textOut->isOk()) {
       if ((w==0) && (h==0) && (x==0) && (y==0)) {
-	doc->displayPages(textOut, firstPage, lastPage, resolution, resolution, 0,
+        doc->displayPages(textOut, firstPage, lastPage, resolution, resolution, 0,
 			  gTrue, gFalse, gFalse);
       } else {
-	
-	for (int page = firstPage; page <= lastPage; ++page) {
-	  doc->displayPageSlice(textOut, page, resolution, resolution, 0,
-			      gTrue, gFalse, gFalse, 
-			      x, y, w, h);
-	}
+
+        for (int page = firstPage; page <= lastPage; ++page) {
+          doc->displayPageSlice(textOut, page, resolution, resolution, 0,
+                      gTrue, gFalse, gFalse,
+                      x, y, w, h);
+        }
       }
 
     } else {
@@ -403,9 +405,9 @@ int main(int argc, char *argv[]) {
       f = stdout;
     } else {
       if (!(f = fopen(textFileName->getCString(), "ab"))) {
-	error(errIO, -1, "Couldn't open text file '{0:t}'", textFileName);
-	exitCode = 2;
-	goto err3;
+        error(errIO, -1, "Couldn't open text file '{0:t}'", textFileName);
+        exitCode = 2;
+        goto err3;
       }
     }
     if (!bbox) fputs("</pre>\n", f);

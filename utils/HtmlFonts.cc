@@ -322,6 +322,7 @@ GooString* HtmlFontAccu::CSStyle(int i, int j){
    GooString *Size=GooString::fromInt(font.getSize());
    GooString *colorStr=font.getColor().toString();
    GooString *fontName=(fontFullName ? font.getFullName() : font.getFontName());
+   GooString *fontNameFull=font.getFullName();
    GooString *lSize;
    
    if(!xml){
@@ -373,12 +374,15 @@ GooString* HtmlFontAccu::CSStyle(int i, int j){
      tmp->append(Size);
      tmp->append("\" family=\"");
      tmp->append(fontName); //font.getFontName());
+     tmp->append("\" fullname=\"");
+     tmp->append(fontNameFull);
      tmp->append("\" color=\"");
      tmp->append(colorStr);
      tmp->append("\"/>");
    }
 
    delete fontName;
+   delete fontNameFull;
    delete colorStr;
    delete jStr;
    delete iStr;

@@ -264,7 +264,7 @@ private:
   friend class TextPage;
 };
 
-struct TextFlowData;
+//struct TextFlowData;
 
 //------------------------------------------------------------------------
 // TextLine
@@ -326,7 +326,7 @@ private:
   int *col;			// starting column number of each Unicode char
   int len;			// number of Unicode chars
   int convertedLen;		// total number of converted characters
-  GBool hyphenated;		// set if last char is a hyphen
+  int hyphenated;		// set if last char is a hyphen
   TextLine *next;		// next line in block
   Unicode *normalized;		// normalized form of Unicode text
   int normalized_len;		// number of normalized Unicode chars
@@ -529,7 +529,7 @@ class TextPage {
 public:
 
   // Constructor.
-  TextPage(GBool rawOrderA);
+  TextPage(int rawOrderA);
 
   void incRefCnt();
   void decRefCnt();
@@ -637,15 +637,15 @@ public:
 #endif
 
 private:
-  
+
   // Destructor.
   ~TextPage();
-  
+
   void clear();
   void assignColumns(TextLineFrag *frags, int nFrags, GBool rot);
   int dumpFragment(Unicode *text, int len, UnicodeMap *uMap, GooString *s);
 
-  GBool rawOrder;		// keep text in content stream order
+  int rawOrder;		// keep text in content stream order
   GBool mergeCombining;		// merge when combining and base characters
 				// are drawn on top of each other
 
@@ -718,7 +718,7 @@ private:
   double actualTextY1;
   int actualTextNBytes;
 };
-  
+
 
 //------------------------------------------------------------------------
 // TextOutputDev
@@ -733,7 +733,7 @@ public:
   // is maintained.  If <rawOrder> is true, the text is kept in
   // content stream order.
   TextOutputDev(char *fileName, GBool physLayoutA,
-		double fixedPitchA, GBool rawOrderA,
+		double fixedPitchA, int rawOrderA,
 		GBool append);
 
   // Create a TextOutputDev which will write to a generic stream.  If
@@ -742,7 +742,7 @@ public:
   // content stream order.
   TextOutputDev(TextOutputFunc func, void *stream,
 		GBool physLayoutA, double fixedPitchA,
-		GBool rawOrderA);
+		int rawOrderA);
 
   // Destructor.
   virtual ~TextOutputDev();
@@ -874,7 +874,7 @@ private:
   double fixedPitch;		// if physLayout is true and this is non-zero,
 				//   assume fixed-pitch characters with this
 				//   width
-  GBool rawOrder;		// keep text in content stream order
+  int rawOrder;		// keep text in content stream order
   GBool doHTML;			// extra processing for HTML conversion
   GBool ok;			// set up ok?
 
