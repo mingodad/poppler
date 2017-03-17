@@ -4318,20 +4318,20 @@ TextSelectionVisitor::TextSelectionVisitor (TextPage *page)
 class TextSelectionDumper : public TextSelectionVisitor {
 public:
   TextSelectionDumper(TextPage *page);
-  virtual ~TextSelectionDumper();
+  ~TextSelectionDumper();
 
   virtual void visitBlock (TextBlock *block,
                            TextLine *begin,
                            TextLine *end,
-                           PDFRectangle *selection) { };
+                           PDFRectangle *selection) override { };
   virtual void visitLine (TextLine *line,
                           TextWord *begin,
                           TextWord *end,
                           int edge_begin,
                           int edge_end,
-                          PDFRectangle *selection);
+                          PDFRectangle *selection) override;
   virtual void visitWord (TextWord *word, int begin, int end,
-                          PDFRectangle *selection);
+                          PDFRectangle *selection) override;
   void endPage();
 
   GooString *getText(void);
@@ -4492,15 +4492,15 @@ public:
   virtual void visitBlock (TextBlock *block,
                            TextLine *begin,
                            TextLine *end,
-                           PDFRectangle *selection) { };
+                           PDFRectangle *selection) override { };
   virtual void visitLine (TextLine *line,
                           TextWord *begin,
                           TextWord *end,
                           int edge_begin,
                           int edge_end,
-                          PDFRectangle *selection);
+                          PDFRectangle *selection)override;
   virtual void visitWord (TextWord *word, int begin, int end,
-                          PDFRectangle *selection) { };
+                          PDFRectangle *selection) override { };
 
   GooList *getRegion () { return list; }
 
@@ -4553,15 +4553,15 @@ public:
   virtual void visitBlock (TextBlock *block,
                            TextLine *begin,
                            TextLine *end,
-                           PDFRectangle *selection) { };
+                           PDFRectangle *selection) override { };
   virtual void visitLine (TextLine *line,
                           TextWord *begin,
                           TextWord *end,
                           int edge_begin,
                           int edge_end,
-                          PDFRectangle *selection);
+                          PDFRectangle *selection) override;
   virtual void visitWord (TextWord *word, int begin, int end,
-                          PDFRectangle *selection);
+                          PDFRectangle *selection) override;
   void endPage();
 
 private:
