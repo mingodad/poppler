@@ -5876,7 +5876,7 @@ void TextOutputDev::fill(GfxState *state) {
   double rx0, ry0, rx1, ry1, t;
   int i;
 
-  if (!doHTML) {
+  if (!(doHTML || (rawOrder > 1))) {
     return;
   }
   path = state->getPath();
