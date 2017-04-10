@@ -73,6 +73,7 @@
 #include "Page.h"
 #include "Annot.h"
 #include "UTF.h"
+#include "Decrypt.h"
 
 #ifdef MACOS
 // needed for setting type/creator of MacOS files
@@ -277,6 +278,21 @@ static int reorderText(Unicode *text, int len, UnicodeMap *uMap, GBool primaryLR
 
   return nCols;
 }
+
+//------------------------------------------------------------------------
+// TextUnderline
+//------------------------------------------------------------------------
+
+class PageImage {
+public:
+
+  PageImage(double x0A, double y0A, double x1A, double y1A, char *img_digest)
+    { x0 = x0A; y0 = y0A; x1 = x1A; y1 = y1A; memcpy(digest, img_digest, sizeof(digest));}
+  ~PageImage() {}
+
+  double x0, y0, x1, y1;
+  char digest[34];
+};
 
 //------------------------------------------------------------------------
 // TextUnderline
@@ -2377,6 +2393,7 @@ TextPage::TextPage(int rawOrderA) {
   haveLastFind = gFalse;
   underlines = new GooList();
   links = new GooList();
+  images = NULL;
   mergeCombining = gTrue;
 }
 
@@ -2392,6 +2409,7 @@ TextPage::~TextPage() {
   delete fonts;
   deleteGooList(underlines, TextUnderline);
   deleteGooList(links, TextLink);
+  if(images) deleteGooList(images, PageImage);
 }
 
 void TextPage::incRefCnt() {
@@ -5412,6 +5430,18 @@ void TextPage::dump(void *outputStream, TextOutputFunc outputFunc,
                    underline->horiz);
             (*outputFunc)(outputStream, xbuf, strlen(xbuf));
         }
+        if(images)
+        {
+            for(int i=0, len=images->getLength(); i < len; ++i)
+            {
+                auto image = (PageImage *)images->get(i);
+                snprintf(xbuf, sizeof(xbuf), ":-3:%d:%d:%d:%d:%d:%s image\n",
+                       (int)image->x0, (int)image->y0,
+                       (int)image->x1, (int)image->y1,
+                       i, image->digest);
+                (*outputFunc)(outputStream, xbuf, strlen(xbuf));
+            }
+        }
         snprintf(xbuf, sizeof(xbuf), ":-2:-2:%d:%d:-2:Page size\n", (int)pageWidth, (int)pageHeight);
         (*outputFunc)(outputStream, xbuf, strlen(xbuf));
     }
@@ -5659,6 +5689,16 @@ TextWordList *TextPage::makeWordList(GBool physLayout) {
   return new TextWordList(this, physLayout);
 }
 #endif
+
+void TextPage::addImage(double x0, double y0, double x1, double y1, char *digest)
+{
+    if(rawOrder > 1)
+    {
+        if(!images) images = new GooList();
+        PageImage *pi = new PageImage(x0, y0, x1, y1, digest);
+        images->append(pi);
+    }
+}
 
 //------------------------------------------------------------------------
 // ActualText
@@ -6052,4 +6092,31 @@ TextPage *TextOutputDev::takeText() {
   ret = text;
   text = new TextPage(rawOrder);
   return ret;
+}
+
+void TextOutputDev::drawImage(GfxState *state, Object *ref, Stream *str,
+		 int width, int height, GfxImageColorMap *colorMap,
+		 GBool interpolate, int *maskColors, GBool inlineImg)
+{
+  double xMin, xMax;		// image x coordinates
+  double yMin, yMax;		// image y coordinates
+  state->transform(0, 0, &xMin, &yMax);
+  state->transform(1, 1, &xMax, &yMin);
+  Guchar digest[32];
+  char hex_digest[34];
+  memset(hex_digest, 0, sizeof(hex_digest));
+  int img_size = 0;
+  Guchar *img = str->toUnsignedChars(&img_size);
+  md5(img, img_size, digest);
+
+  static const char *hex = "0123456789abcdef";
+  char *to = hex_digest;
+  Guchar *p=digest;
+  for (int len=16; len--; p++) {
+    *to++ = hex[p[0] >> 4];
+    *to++ = hex[p[0] & 0x0f];
+  }
+  *to = '\0';
+
+  text->addImage(xMin, yMin, xMax, yMax, hex_digest);
 }

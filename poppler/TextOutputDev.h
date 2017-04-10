@@ -636,6 +636,9 @@ public:
   TextWordList *makeWordList(GBool physLayout);
 #endif
 
+  // Add an image.
+  void addImage(double x0, double y0, double x1, double y1, char *digest);
+
 private:
 
   // Destructor.
@@ -680,6 +683,7 @@ private:
 
   GooList *underlines;		// [TextUnderline]
   GooList *links;		// [TextLink]
+  GooList *images;		// [TextLink]
 
   int refCnt;
 
@@ -764,7 +768,7 @@ public:
   GBool interpretType3Chars() override { return gFalse; }
 
   // Does this device need non-text content?
-  GBool needNonText() override { return gFalse; }
+  GBool needNonText() override { return rawOrder > 1; }
 
   // Does this device require incCharCount to be called for text on
   // non-shown layers?
@@ -861,6 +865,10 @@ public:
 
   // Turn extra processing for HTML conversion on or off.
   void enableHTMLExtras(GBool doHTMLA) { doHTML = doHTMLA; }
+
+   void drawImage(GfxState *state, Object *ref, Stream *str,
+		 int width, int height, GfxImageColorMap *colorMap,
+		 GBool interpolate, int *maskColors, GBool inlineImg) override;
 
 private:
 
