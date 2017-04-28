@@ -172,7 +172,7 @@ static const char *base14SubstFonts[14] = {
 //------------------------------------------------------------------------
 
 static int parseCharName(char *charName, Unicode *uBuf, int uLen,
-			 GBool names, GBool ligatures, 
+			 GBool names, GBool ligatures,
 			 GBool numeric, GBool hex, GBool variants);
 
 //------------------------------------------------------------------------
@@ -524,20 +524,21 @@ void GfxFont::readFontDescriptor(XRef *xref, Dict *fontDict) {
       else error(errSyntaxWarning, -1, "Invalid Font Stretch");
     }
     obj2.free();
-    
+
     // get weight
     obj1.dictLookup("FontWeight", &obj2);
     if (obj2.isNum()) {
-      if (obj2.getNum() == 100) weight = W100;
-      else if (obj2.getNum() == 200) weight = W200;
-      else if (obj2.getNum() == 300) weight = W300;
-      else if (obj2.getNum() == 400) weight = W400;
-      else if (obj2.getNum() == 500) weight = W500;
-      else if (obj2.getNum() == 600) weight = W600;
-      else if (obj2.getNum() == 700) weight = W700;
-      else if (obj2.getNum() == 800) weight = W800;
-      else if (obj2.getNum() == 900) weight = W900;
-      else error(errSyntaxWarning, -1, "Invalid Font Weight");
+      double fw= obj2.getNum();
+      if (fw == 100) weight = W100;
+      else if (fw == 200) weight = W200;
+      else if (fw == 300) weight = W300;
+      else if (fw == 400) weight = W400;
+      else if (fw == 500) weight = W500;
+      else if (fw == 600) weight = W600;
+      else if (fw == 700) weight = W700;
+      else if ((fw >= 800) && (fw < 900)) weight = W800;
+      else if (fw == 900) weight = W900;
+      else error(errSyntaxWarning, -1, "Invalid Font Weight {0:f}", fw);
     }
     obj2.free();
 
@@ -1395,7 +1396,7 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GooString *nameA
     for (code = 0; code < 256; ++code) {
       if (!toUnicode[code]) {
 	if ((charName = enc[code]) && strcmp(charName, ".notdef")
-	    && (n = parseCharName(charName, uBuf, sizeof(uBuf)/sizeof(*uBuf), 
+	    && (n = parseCharName(charName, uBuf, sizeof(uBuf)/sizeof(*uBuf),
 				  gFalse, // don't check simple names (pass 1)
 				  gTrue, // do check ligatures
 				  numeric,
@@ -1493,7 +1494,7 @@ Gfx8BitFont::Gfx8BitFont(XRef *xref, const char *tagA, Ref idA, GooString *nameA
       }
     }
 
-  // couldn't find widths -- use defaults 
+  // couldn't find widths -- use defaults
   } else {
     // this is technically an error -- the Widths entry is required
     // for all but the Base-14 fonts -- but certain PDF generators
@@ -1624,7 +1625,7 @@ static int parseCharName(char *charName, Unicode *uBuf, int uLen,
       int i;
       unsigned int m;
       for (i = 0, m = 3; i < uLen && m < n; m += 4) {
-	if (isxdigit(charName[m]) && isxdigit(charName[m + 1]) && 
+	if (isxdigit(charName[m]) && isxdigit(charName[m + 1]) &&
 	    isxdigit(charName[m + 2]) && isxdigit(charName[m + 3])) {
 	  unsigned int u;
 	  sscanf(charName + m, "%4x", &u);
@@ -2276,7 +2277,7 @@ int GfxCIDFont::mapCodeToGID(FoFiTrueType *ff, int cmapi,
 int *GfxCIDFont::getCodeToGIDMap(FoFiTrueType *ff, int *mapsizep) {
 #define N_UCS_CANDIDATES 2
   /* space characters */
-  static const unsigned long spaces[] = { 
+  static const unsigned long spaces[] = {
     0x2000,0x2001,0x2002,0x2003,0x2004,0x2005,0x2006,0x2007,
     0x2008,0x2009,0x200A,0x00A0,0x200B,0x2060,0x3000,0xFEFF,
     0
@@ -2374,7 +2375,7 @@ int *GfxCIDFont::getCodeToGIDMap(FoFiTrueType *ff, int *mapsizep) {
   if (!ctu) return NULL;
   if (getCollection()->cmp("Adobe-Identity") == 0) return NULL;
   if (getEmbeddedFontID(&embID)) {
-   /* if this font is embedded font, 
+   /* if this font is embedded font,
     * CIDToGIDMap should be embedded in PDF file
     * and already set. So return it.
     */
