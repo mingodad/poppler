@@ -5404,8 +5404,8 @@ void TextPage::dump(void *outputStream, TextOutputFunc outputFunc,
                      (int)fisrtWord->xMin, (int)fisrtWord->yMax,
                      (int)word->xMax, (int)fisrtWord->fontSize, first_font_id
                      /*, last_font_id*/);
+            (*outputFunc)(outputStream, xbuf, strlen(xbuf));
         }
-        (*outputFunc)(outputStream, xbuf, strlen(xbuf));
         (*outputFunc)(outputStream, rawLine.getCString(), rawLine.getLength());
         rawLine.clear();
         firstx = true;
