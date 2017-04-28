@@ -78,6 +78,7 @@ static GBool bboxLayout = gFalse;
 static GBool physLayout = gFalse;
 static double fixedPitch = 0;
 static int rawOrder = 0;
+static int rawOrder2 = 0;
 static GBool htmlMeta = gFalse;
 static char textEncName[128] = "";
 static char textEOL[16] = "";
@@ -110,8 +111,8 @@ static const ArgDesc argDesc[] = {
    "assume fixed-pitch (or tabular) text"},
   {"-raw",     argFlag,     &rawOrder,      0,
    "keep strings in content stream order"},
-  {"-raw2",     argInt,     &rawOrder,      0,
-   "keep strings in content stream order2"},
+  {"-raw2",     argFlag,     &rawOrder2,      0,
+   "keep strings in content stream order, prepended with position info"},
   {"-htmlmeta", argFlag,   &htmlMeta,       0,
    "generate a simple HTML file, including the meta information"},
   {"-enc",     argString,   textEncName,    sizeof(textEncName),
@@ -186,6 +187,9 @@ int main(int argc, char *argv[]) {
 
   // parse args
   ok = parseArgs(argDesc, &argc, argv);
+  if(rawOrder2) {
+    rawOrder = 2;
+  }
   if (bboxLayout) {
     bbox = gTrue;
   }
