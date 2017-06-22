@@ -65,11 +65,21 @@ static GBool quiet = gFalse;
 static GBool printVersion = gFalse;
 static GBool printHelp = gFalse;
 
+static int hdpi = 72;
+static int vdpi = 72;
+static int hvdpi = 72;
+
 static const ArgDesc argDesc[] = {
   {"-f",      argInt,      &firstPage,     0,
    "first page to convert"},
   {"-l",      argInt,      &lastPage,      0,
    "last page to convert"},
+  {"-hdpi",      argInt,      &hdpi,     72,
+   "horizontal dpi=72"},
+  {"-vdpi",      argInt,      &vdpi,     72,
+   "vertical dpi=72"},
+  {"-hvdpi",      argInt,      &hvdpi,     0,
+   "horizonta & vertical dpi=72"},
 #if ENABLE_LIBPNG
   {"-png",      argFlag,     &enablePNG,      0,
    "change the default output format to PNG"},
@@ -161,6 +171,10 @@ int main(int argc, char *argv[]) {
       fileName = new GooString("fd://0");
   }
 
+  if(hvdpi)
+  {
+      hdpi = vdpi = hvdpi;
+  }
   doc = PDFDocFactory().createPDFDoc(*fileName, ownerPW, userPW);
   delete fileName;
 
@@ -214,7 +228,7 @@ int main(int argc, char *argv[]) {
       imgOut->enableJBig2(dumpJBIG2);
       imgOut->enableCCITT(dumpCCITT);
     }
-    doc->displayPages(imgOut, firstPage, lastPage, 72, 72, 0,
+    doc->displayPages(imgOut, firstPage, lastPage, hdpi, vdpi, 0,
                       gTrue, gFalse, gFalse);
   }
   delete imgOut;
