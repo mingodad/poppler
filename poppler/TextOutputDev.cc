@@ -5226,6 +5226,7 @@ void TextPage::dump(void *outputStream, TextOutputFunc outputFunc,
   if (rawOrder) {
     bool firstx = true;
     bool rawOrder2 = rawOrder > 1;
+    bool rawOrder3 = rawOrder == 3;
     char xbuf[256];
     TextWord *fisrtWord;
     GooString rawLine;
@@ -5361,12 +5362,16 @@ void TextPage::dump(void *outputStream, TextOutputFunc outputFunc,
                     {
                         //(*outputFunc)(outputStream, spacex10, bigSpace);
                         rawLine.append(spacex10, 2 /*bigSpace*/);
+                        //rawLine.append(spacex10, bigSpace);
+                        //rawLine.append(spacex10, 4 /*bigSpace*/);
                         spaces -= bigSpace;
                     }
                     else
                     {
                         //(*outputFunc)(outputStream, spacex10, spaces);
                         rawLine.append(spacex10, spaces > 1 ? 2 : 1 /*spaces*/);
+                        //rawLine.append(spacex10, spaces);
+                        //rawLine.append(spacex10, spaces > 3 ? 4 : spaces);
                         spaces -= spaces;
                     }
                 }
@@ -5398,20 +5403,23 @@ void TextPage::dump(void *outputStream, TextOutputFunc outputFunc,
                 ghfonts.add(last_font_name, last_font_id);
             }
             */
-            snprintf(xbuf, sizeof(xbuf),
-                     //":%d:%d:%d:%d:%d:%d:",
-                     ":%d:%d:%d:%d:%d:",
-                     (int)fisrtWord->xMin, (int)fisrtWord->yMax,
-                     (int)word->xMax, (int)fisrtWord->fontSize, first_font_id
-                     /*, last_font_id*/);
-            (*outputFunc)(outputStream, xbuf, strlen(xbuf));
+            if(!rawOrder3)
+            {
+                snprintf(xbuf, sizeof(xbuf),
+                         //":%d:%d:%d:%d:%d:%d:",
+                         ":%d:%d:%d:%d:%d:",
+                         (int)fisrtWord->xMin, (int)fisrtWord->yMax,
+                         (int)word->xMax, (int)fisrtWord->fontSize, first_font_id
+                         /*, last_font_id*/);
+                (*outputFunc)(outputStream, xbuf, strlen(xbuf));
+            }
         }
         (*outputFunc)(outputStream, rawLine.getCString(), rawLine.getLength());
         rawLine.clear();
         firstx = true;
       }
     }
-    if(rawOrder2)
+    if(rawOrder2 && !rawOrder3)
     {
         GooHashIter *iter;
         GooString *key;
